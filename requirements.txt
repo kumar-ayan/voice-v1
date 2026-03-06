@@ -1,20 +1,30 @@
 # VoiceAI — requirements
 # Install with: pip install -r requirements.txt
 
+python-dotenv>=1.0.0      # reads .env for secrets (HF_TOKEN, etc.)
+
 torch>=2.2.0
 torchaudio>=2.2.0
 
-# Audio processing
+# ── Audio processing ──────────────────────────────────────────────────────────
 librosa>=0.10.0
 soundfile>=0.12.1
+pyworld>=0.3.4          # WORLD vocoder — pitch (F0) extraction
 
-# Utilities
+# ── HuggingFace datasets (People's Speech streaming) ─────────────────────────
+datasets>=2.18.0
+huggingface_hub>=0.22.0
+
+# ── Grapheme-to-Phoneme (G2P) ─────────────────────────────────────────────────
+# Requires eSpeak-NG installed on PATH:
+#   Windows: https://github.com/espeak-ng/espeak-ng/releases
+#   Linux:   sudo apt install espeak-ng
+phonemizer>=3.2.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
 numpy>=1.26.0
 scipy>=1.12.0
 tqdm>=4.66.0
 
-# Optional: faster phonemizer
-phonemizer>=3.2.0    # uses eSpeak backend for G2P
-
-# Optional: experiment logging
+# ── Optional: experiment logging ──────────────────────────────────────────────
 tensorboard>=2.15.0

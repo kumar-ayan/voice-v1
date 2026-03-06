@@ -1,0 +1,87 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+wheels/
+*.spec
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# ── Secrets & credentials  ⚠️  NEVER COMMIT THESE ────────────────────────────
+.env
+.env.*
+!.env.example        # allow the template
+secrets.json
+*.key
+*.pem
+*.p12
+hf_token.txt
+huggingface_token*
+
+# ── Model checkpoints & weights ───────────────────────────────────────────────
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+
+# ── Training data ─────────────────────────────────────────────────────────────
+data/
+datasets/
+*.wav
+*.flac
+*.mp3
+*.ogg
+
+# ── Pre-computed features ─────────────────────────────────────────────────────
+mels/
+pitch/
+energy/
+durations/
+wavs/
+
+# ── Logs & TensorBoard ────────────────────────────────────────────────────────
+logs/
+runs/
+*.log
+wandb/
+mlruns/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+*.ipynb
+
+# ── HuggingFace cache ─────────────────────────────────────────────────────────
+.cache/
+~/.cache/huggingface/
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Temporary / scratch ───────────────────────────────────────────────────────
+tmp/
+temp/
+scratch/
+output.wav
+*.tmp

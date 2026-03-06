@@ -136,6 +136,30 @@ class TrainingConfig:
 
 
 @dataclass
+class DatasetConfig:
+    """HuggingFace dataset settings used by dataset.py and train.py."""
+    # HuggingFace repo id
+    hf_repo: str = "MLCommons/peoples_speech"
+    # Dataset config / subset name
+    # Choices: "microset" | "clean" | "dirty" | "clean_sa" | "dirty_sa"
+    hf_config: str = "microset"
+    # HF split names
+    train_split: str = "train"
+    val_split: str = "validation"
+    # Stream from HF instead of loading everything into RAM
+    streaming: bool = True
+    # Number of DataLoader workers
+    num_workers: int = 0          # 0 = main process (safe for streaming)
+    # Fallback to local disk data (set to a path string to override HF)
+    # e.g. local_data_dir = "./data"   → reads metadata.csv + .pt files
+    local_data_dir: str = ""
+    # Fraction of data used for training (rest = validation)
+    train_ratio: float = 0.95
+    # Cap number of items per epoch (None = unlimited)
+    max_items: int = 0            # 0 = no cap
+
+
+@dataclass
 class ModelConfig:
     text_encoder: TextEncoderConfig = field(default_factory=TextEncoderConfig)
     emotion: EmotionConfig = field(default_factory=EmotionConfig)
@@ -144,5 +168,6 @@ class ModelConfig:
     mel: MelConfig = field(default_factory=MelConfig)
     vocoder: VocoderConfig = field(default_factory=VocoderConfig)
     training: TrainingConfig = field(default_factory=TrainingConfig)
+    dataset: DatasetConfig = field(default_factory=DatasetConfig)
     # Shared hidden dimension across encoder / decoder
     hidden_dim: int = 256
