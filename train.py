@@ -28,7 +28,7 @@ import logging
 import torch
 import torch.nn as nn
 import torchaudio.transforms as T
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 from model.config import ModelConfig
 from model.voice_ai import VoiceAI
@@ -104,7 +104,7 @@ def train_acoustic(cfg: ModelConfig, resume: str | None = None):
         pitch_weight=tcfg.pitch_loss_weight,
         energy_weight=tcfg.energy_loss_weight,
     )
-    scaler = GradScaler(enabled=tcfg.fp16)
+    scaler = GradScaler("cuda", enabled=tcfg.fp16)
 
     step = 0
     if resume:
@@ -203,7 +203,7 @@ def train_vocoder(cfg: ModelConfig, acoustic_ckpt: str):
         f_min=mel_cfg.f_min, f_max=mel_cfg.f_max,
     ).to(device)
 
-    scaler   = GradScaler(enabled=tcfg.fp16)
+    scaler   = GradScaler("cuda", enabled=tcfg.fp16)
     train_dl = build_dataloader(cfg, split="train")
     step     = 0
 

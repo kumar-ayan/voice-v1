@@ -252,26 +252,57 @@ class HFVoiceDataset(IterableDataset):
         hf_token = _get_hf_token()
         if hf_token:
             log.info("HF token found — authenticated access enabled")
+
+        # Some configs (e.g. microset) only have a 'train' split.
+        # For validation we fall back to a tail slice of 'train'.
+        available_splits = self._get_available_splits(dcfg)
+        if hf_split not in available_splits:
+            log.warning(
+                f"Split {hf_split!r} not available for config {dcfg.hf_config!r}. "
+                f"Available: {available_splits}. Using 'train' tail as validation."
+            )
+            self._val_fallback = True
+            hf_split = dcfg.train_split
+        else:
+            self._val_fallback = (split != "train")
+
+        self._split = split
         self._hf_ds = load_dataset(
             dcfg.hf_repo,
             dcfg.hf_config,
             split=hf_split,
             streaming=dcfg.streaming,
-            trust_remote_code=True,
             token=hf_token,
         ).cast_column("audio", HFAudio(sampling_rate=16_000))
 
+    @staticmethod
+    def _get_available_splits(dcfg) -> list[str]:
+        """Query available splits without downloading data."""
+        try:
+            from datasets import get_dataset_split_names
+            return get_dataset_split_names(dcfg.hf_repo, dcfg.hf_config)
+        except Exception:
+            return ["train"]   # safe fallback
+
     def __iter__(self) -> Iterator[dict]:
         count = 0
-        for item in self._hf_ds:
+        # When there's no real val split, use every 20th item as validation (~5%)
+        is_val_fallback = getattr(self, "_val_fallback", False)
+        for i, item in enumerate(self._hf_ds):
             if self.max_items and count >= self.max_items:
                 break
+            # Val-fallback filtering: train=skip 20th; val=keep only 20th
+            if is_val_fallback:
+                if self._split == "train" and i % 20 == 0:
+                    continue   # reserve these for validation
+                if self._split != "train" and i % 20 != 0:
+                    continue   # skip training items
             try:
                 audio  = item["audio"]
                 array  = np.array(audio["array"], dtype=np.float32)
                 sr     = audio["sampling_rate"]
                 text   = item.get("text", "").strip()
-                if not text or len(array) < sr * 0.3:   # skip < 0.3 s
+                if not text or len(array) < sr * 0.3:
                     continue
                 yield _build_item(array, sr, text, self.mel_cfg)
                 count += 1
